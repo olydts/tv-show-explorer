@@ -18,9 +18,9 @@ from utils.book_analyzer import GutenbergAnalyzer
 from utils.chart_generator import ChartFactory, ParagraphHistogram
 
 
-# ══════════════════════════════════════════════════════════════════
+
 # Fixtures communes
-# ══════════════════════════════════════════════════════════════════
+
 
 SAMPLE_SHOW = {
     "id": 1,
@@ -62,9 +62,9 @@ SAMPLE_SHOW_3 = {
 }
 
 
-# ══════════════════════════════════════════════════════════════════
+
 # Tests Database
-# ══════════════════════════════════════════════════════════════════
+
 
 class TestDatabaseManager(unittest.TestCase):
     """Tests de la couche base de données."""
@@ -152,9 +152,9 @@ class TestDatabaseManager(unittest.TestCase):
         self.assertEqual(rows[1]["name"], "Game of Thrones")
 
 
-# ══════════════════════════════════════════════════════════════════
+
 # Tests API Fetcher (normalisation seulement, sans réseau)
-# ══════════════════════════════════════════════════════════════════
+
 
 class TestTVmazeFetcher(unittest.TestCase):
     """Tests de la normalisation des données TVmaze."""
@@ -228,9 +228,9 @@ class TestTVmazeFetcher(unittest.TestCase):
         self.assertEqual(result["genres"], "")
 
 
-# ══════════════════════════════════════════════════════════════════
+
 # Tests Book Analyzer (sans réseau)
-# ══════════════════════════════════════════════════════════════════
+
 
 class TestGutenbergAnalyzer(unittest.TestCase):
     """Tests de l'analyseur de texte (données simulées)."""
@@ -316,9 +316,9 @@ The shadow was caught by Mrs. Darling.
             analyzer.get_first_chapter()
 
 
-# ══════════════════════════════════════════════════════════════════
+
 # Tests ChartFactory
-# ══════════════════════════════════════════════════════════════════
+
 
 class TestChartFactory(unittest.TestCase):
 
@@ -351,9 +351,9 @@ class TestChartFactory(unittest.TestCase):
             self.assertEqual(result, expected, f"floor({raw}/10)*10 should be {expected}")
 
 
-# ══════════════════════════════════════════════════════════════════
+
 # Runner
-# ══════════════════════════════════════════════════════════════════
+
 
 if __name__ == "__main__":
     loader = unittest.TestLoader()

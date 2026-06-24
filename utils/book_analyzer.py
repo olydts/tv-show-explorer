@@ -45,7 +45,7 @@ class GutenbergAnalyzer(BaseTextAnalyzer):
         self._metadata: dict = {}
         self._chapter: str = ""
 
-    # ── Chargement ─────────────────────────────
+    #  Chargement 
     def load(self, source: str = None) -> str:
         """Télécharge le texte depuis Gutenberg."""
         url = source or self.GUTENBERG_URL
@@ -62,7 +62,7 @@ class GutenbergAnalyzer(BaseTextAnalyzer):
             raise ConnectionError(f"Impossible de télécharger le livre : {e}") from e
         return self._raw_text
 
-    # ── Métadonnées ────────────────────────────
+    #  Métadonnées 
     def extract_metadata(self) -> dict:
         """Extrait titre, auteur depuis l'en-tête Gutenberg."""
         if not self._raw_text:
@@ -82,50 +82,75 @@ class GutenbergAnalyzer(BaseTextAnalyzer):
     def metadata(self) -> dict:
         return self._metadata
 
-    # ── Extraction du premier chapitre ─────────
+    #  Extraction du premier chapitre 
     def get_first_chapter(self) -> str:
         """Extrait le texte du premier chapitre."""
         if not self._raw_text:
             raise RuntimeError("Appelez load() avant get_first_chapter().")
 
-        # Cherche le début du premier chapitre
+        # Cherche "CHAPTER I." ou "Chapter I."
         patterns = [
-            r"CHAPTER\s+I[\.\s]",
-            r"Chapter\s+I[\.\s]",
-            r"CHAPTER\s+1[\.\s]",
+            r"CHAPTER\s+I\.",
+            r"Chapter\s+I\.",
         ]
+        
+        # Trouve TOUTES les occurrences (la première = table des matières, la deuxième = vrai chapitre)
         start = -1
         for pattern in patterns:
-            m = re.search(pattern, self._raw_text)
-            if m:
-                start = m.start()
+            matches = list(re.finditer(pattern, self._raw_text))
+            if len(matches) >= 2:
+                # Prend la DEUXIÈME occurrence (après la table des matières)
+                match = matches[1]
+                # Saute "CHAPTER I." + le nom du chapitre (ligne suivante)
+                after_header = self._raw_text[match.end():]
+                # Saute la ligne du titre du chapitre
+                lines = after_header.split('\n')
+                skip = 0
+                for i, line in enumerate(lines):
+                    if line.strip() == '':
+                        continue
+                    skip = i + 1  # Saute le nom du chapitre
+                    break
+                real_start = match.end() + len('\n'.join(lines[:skip+1]))
+                start = real_start
+                break
+            elif len(matches) == 1:
+                # Une seule occurrence, saute quand même le nom du chapitre
+                match = matches[0]
+                after_header = self._raw_text[match.end():]
+                lines = after_header.split('\n')
+                skip = 0
+                for i, line in enumerate(lines):
+                    if line.strip() == '':
+                        continue
+                    skip = i + 1
+                    break
+                start = match.end() + len('\n'.join(lines[:skip+1]))
                 break
 
         if start == -1:
-            # Fallback : prend les 5000 premiers chars après l'en-tête
             end_header = self._raw_text.find("*** START OF")
             start = end_header + 200 if end_header > 0 else 1000
 
-        # Cherche le début du chapitre II pour délimiter
+        # Cherche le début du chapitre II
         patterns_ch2 = [
-            r"CHAPTER\s+II[\.\s]",
-            r"Chapter\s+II[\.\s]",
-            r"CHAPTER\s+2[\.\s]",
+            r"CHAPTER\s+II\.",
+            r"Chapter\s+II\.",
         ]
         end = -1
         for pattern in patterns_ch2:
-            m = re.search(pattern, self._raw_text[start + 10:])
-            if m:
-                end = start + 10 + m.start()
+            matches = list(re.finditer(pattern, self._raw_text[start:]))
+            if matches:
+                end = start + matches[0].start()
                 break
 
         if end == -1:
-            end = start + 8000  # Fallback : 8000 chars
+            end = start + 8000
 
         self._chapter = self._raw_text[start:end].strip()
         return self._chapter
 
-    # ── Analyse des paragraphes ─────────────────
+    #  Analyse des paragraphes 
     def analyze_paragraphs(self) -> dict:
         """
         Compte les mots par paragraphe, arrondit à la dizaine,
@@ -163,7 +188,7 @@ class GutenbergAnalyzer(BaseTextAnalyzer):
             "avg_words":      round(sum(word_counts) / len(word_counts), 1) if word_counts else 0,
         }
 
-    # ── Image ──────────────────────────────────
+    # Image 
     def download_image(self, url: str, dest_path: str) -> str:
         """Télécharge une image depuis une URL."""
         try:

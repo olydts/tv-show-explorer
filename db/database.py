@@ -8,9 +8,9 @@ import os
 from abc import ABCMeta, abstractmethod
 
 
-# ──────────────────────────────────────────────
-# Classe abstraite : contrat pour tout gestionnaire de données
-# ──────────────────────────────────────────────
+
+# Classe abstraite (contrat pour tout gestionnaire de données)
+
 class AbstractDataManager(metaclass=ABCMeta):
     """Interface définissant les opérations obligatoires sur les données."""
 
@@ -31,9 +31,9 @@ class AbstractDataManager(metaclass=ABCMeta):
         pass
 
 
-# ──────────────────────────────────────────────
+
 # Implémentation concrète SQLite
-# ──────────────────────────────────────────────
+
 class DatabaseManager(AbstractDataManager):
     """Gère la persistance des séries TV dans SQLite."""
 
@@ -43,7 +43,7 @@ class DatabaseManager(AbstractDataManager):
         self._connection = None
         self._init_db()
 
-    # ── Connexion ──────────────────────────────
+    #  Connexion
     def _get_connection(self) -> sqlite3.Connection:
         if self._connection is None:
             self._connection = sqlite3.connect(self.DB_PATH)
@@ -69,7 +69,7 @@ class DatabaseManager(AbstractDataManager):
         """)
         conn.commit()
 
-    # ── Opérations CRUD ────────────────────────
+    #  Opérations CRUD 
     def insert(self, data: dict) -> None:
         """Insère une série. Ignore si l'ID existe déjà."""
         conn = self._get_connection()
@@ -97,7 +97,7 @@ class DatabaseManager(AbstractDataManager):
         conn = self._get_connection()
         return conn.execute("SELECT COUNT(*) FROM shows").fetchone()[0]
 
-    # ── Agrégations SQL ────────────────────────
+    #  Agrégations SQL 
     def average_rating(self) -> float:
         """Moyenne des notes (requête SQL)."""
         conn = self._get_connection()

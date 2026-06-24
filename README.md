@@ -26,6 +26,8 @@ tv_project/
 │   └── test_all.py            # 29 tests unitaires (unittest)
 │
 └── assets/                    # Graphiques générés + rapport Word (créé à l'exécution)
+    ├── logo_bw.png            # Logo noir et blanc (à placer ici manuellement)
+    └── ...
 ```
 
 ---
@@ -34,7 +36,7 @@ tv_project/
 
 ```bash
 # 1. Cloner le dépôt
-git clone https://github.com/VOTRE_USER/tv-show-explorer.git
+git clone https://github.com/TON_USERNAME/tv-show-explorer.git
 cd tv-show-explorer
 
 # 2. Créer un environnement virtuel (recommandé)
@@ -51,34 +53,45 @@ python app.py
 
 ---
 
+## 🖼️ Image logo (Partie 2)
+
+Le rapport Word utilise un logo noir et blanc (`assets/logo_bw.png`).
+Place ton image dans le dossier `assets/` avant de générer le rapport.
+Si aucune image n'est présente, un logo YNOV est généré automatiquement.
+
+---
+
 ## 🎯 Fonctionnalités
 
 ### Partie 1 – Application Desktop (Tkinter)
 
-| Fonctionnalité | Description |
+| Bouton | Description |
 |---|---|
-| **Recherche** | Recherche de séries par nom via l'API TVmaze (JSON) |
-| **Séries populaires** | Chargement de la page 0 de l'API (250+ séries) |
-| **Stockage SQLite** | Persistance locale avec détection DB non vide |
-| **Vider la base** | Suppression avec confirmation utilisateur |
-| **Tableau de données** | Affichage trié par note, scrollable |
-| **Agrégations SQL** | AVG(rating), COUNT(*), TOP 1 calculés en SQL |
-| **4 graphiques** | Barres (notes), Camembert (statuts), Langues, Genres |
-| **Sauvegarde graphiques** | Export PNG via boîte de dialogue |
-| **Barre d'état** | Informations temps réel sur les opérations |
-| **Threads** | Appels réseau non bloquants (threading.Thread) |
+| **Rechercher** | Recherche une série par nom via TVmaze API et la stocke en SQLite |
+| **Séries populaires** | Charge ~485 séries populaires depuis TVmaze (2 pages × ~250) |
+| **Vider la base** | Supprime toutes les données SQLite avec confirmation |
+| **📈 Notes (barres)** | Graphique top 10 séries par note moyenne |
+| **🥧 Statuts (camembert)** | Répartition Running / Ended / To Be Determined |
+| **🌍 Langues** | Distribution des séries par langue |
+| **🎭 Genres** | Distribution des genres en base |
+| **💾 Enregistrer** | Export PNG du graphique affiché |
+
+**Agrégations SQL affichées en temps réel :**
+- `AVG(rating)` – note moyenne
+- `COUNT(*)` – nombre de séries
+- `TOP 1` – meilleure série
 
 ### Partie 2 – Rapport Word (Peter Pan – Gutenberg)
 
 | Étape | Description |
 |---|---|
-| **Téléchargement** | Livre Peter Pan depuis Project Gutenberg |
-| **Extraction** | Titre, auteur, Chapitre I |
-| **Analyse paragraphes** | Compte mots, arrondit à la dizaine, trie |
-| **Graphique** | Distribution des longueurs (histogramme) |
-| **Image #1** | Affiche Peter Pan téléchargée + recadrée/redimensionnée |
-| **Image #2 (logo)** | Logo N&B généré, pivoté, collé sur l'image |
-| **Rapport Word** | Page titre + page graphique + page description + stats |
+| **Téléchargement** | Livre Peter Pan depuis Project Gutenberg (automatique) |
+| **Extraction** | Titre, auteur, Chapitre I (ignore la table des matières) |
+| **Analyse paragraphes** | Compte mots par §, arrondit à la dizaine, trie |
+| **Graphique** | Histogramme distribution longueurs paragraphes |
+| **Image #1** | Affiche Peter Pan téléchargée, recadrée et redimensionnée |
+| **Image #2 (logo)** | Logo  pivoté 15°, collé sur l'image #1 |
+| **Rapport Word** | Page titre + page graphique + page extrait + statistiques |
 
 ---
 
@@ -125,28 +138,30 @@ python -m unittest tests.test_all -v
 
 ## 📊 API utilisée
 
-- **TVmaze** : `https://api.tvmaze.com` – Gratuite, pas de clé requise
-  - `/search/shows?q={query}` : recherche
-  - `/shows?page={n}` : séries populaires
+- **TVmaze** : `https://api.tvmaze.com` , sans clé requise
+  - `/search/shows?q={query}` : recherche par nom
+  - `/shows?page={n}` : séries populaires par page (~250 par page)
 
 ---
 
 ## 📄 Source littéraire
 
 - **Peter Pan** (J. M. Barrie, 1911)
-- Source : [Project Gutenberg #16](https://www.gutenberg.org/ebooks/16)
+- Téléchargé automatiquement depuis [Project Gutenberg #16](https://www.gutenberg.org/ebooks/16)
+- Extraction automatique du Chapitre I 
 
 ---
 
 ## 🎁 Bonus implémentés
 
-- [x] Barre d'état (`StatusBar`) en bas de la fenêtre
+- [x] Barre d'état en bas de la fenêtre (opérations en temps réel)
 - [x] Threads pour ne pas bloquer l'UI pendant les requêtes réseau
-- [x] Gestion complète des exceptions (réseau, JSON, pillow, docx)
-- [x] GitHub : publier ce dépôt pour le bonus ±1 point
+- [x] Gestion complète des exceptions (réseau, JSON, Pillow, docx)
+- [x] `check_same_thread=False` pour SQLite multi-thread
+- [x] `INSERT OR IGNORE` pour éviter les doublons en base
 
 ---
 
 ## 👤 Auteur
 
-Étudiant(e) – Python Avancé – YNOV Campus Paris
+DOTSU Olympe – Python Avancé – YNOV Campus Paris

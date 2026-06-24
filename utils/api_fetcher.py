@@ -58,11 +58,16 @@ class TVmazeFetcher(BaseFetcher):
         raw = self._get(url)
         return [self._normalize(item["show"]) for item in raw if "show" in item]
 
-    def fetch_popular(self, page: int = 0) -> list:
-        """Récupère les séries populaires (page 0 = les premières)."""
-        url = f"{self.BASE_URL}/shows?page={page}"
-        raw = self._get(url)
-        return [self._normalize(show) for show in raw]
+    def fetch_popular(self, pages: int = 4) -> list:
+        all_shows = []
+        for page in range(pages):
+            try:
+                url = f"{self.BASE_URL}/shows?page={page}"
+                raw = self._get(url)
+                all_shows.extend([self._normalize(show) for show in raw])
+            except Exception:
+                break  # Arrête si plus de pages disponibles
+        return all_shows
 
     def _normalize(self, show: dict) -> dict:
         """Transforme une réponse TVmaze en dict plat pour la DB."""

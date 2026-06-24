@@ -1,6 +1,6 @@
 """
-Module de génération du rapport Word (Partie 2).
-Utilise python-docx. Architecture OOP avec surcharge de méthodes.
+Génération du rapport Word (Partie 2)
+Utilise python-docx. Architecture OOP avec surcharge de méthodes
 """
 
 import os
@@ -24,14 +24,14 @@ class WordReportGenerator:
     Méthodes surchargées : _add_heading existe en version H1, H2, H3.
     """
 
-    AUTHOR = "Étudiant(e) – Python Avancé"
+    AUTHOR = "DOTSU olympe - Python Avancé"
     ACCENT_COLOR = RGBColor(0x6C, 0x63, 0xFF)  # Violet #6C63FF
 
     def __init__(self):
         self._doc = Document()
         self._setup_styles()
 
-    # ── Styles ──────────────────────────────────
+    #  Styles 
     def _setup_styles(self) -> None:
         """Configure les styles globaux du document."""
         style = self._doc.styles["Normal"]
@@ -45,7 +45,7 @@ class WordReportGenerator:
             section.left_margin = Cm(3)
             section.right_margin = Cm(2.5)
 
-    # ── Surcharge de _add_heading (niveaux 1/2/3) ─
+    # Surcharge de _add_heading (niveaux 1/2/3) ─
     def _add_heading(self, text: str, level: int = 1,
                      bold: bool = True, italic: bool = False,
                      color: RGBColor = None) -> None:
@@ -112,7 +112,7 @@ class WordReportGenerator:
         run_value = p.add_run(value)
         run_value.font.size = Pt(11)
 
-    # ── Construction du rapport ──────────────────
+    # Construction du rapport 
     def generate(
         self,
         metadata: dict,
@@ -136,7 +136,7 @@ class WordReportGenerator:
         self._doc.save(output_path)
         return output_path
 
-    # ── Page de titre ────────────────────────────
+    #  Page de titre 
     def _build_title_page(self, metadata: dict, image_path: str | None) -> None:
         """Page 1 : titre du livre, image, auteur, auteur du rapport."""
         self._doc.add_paragraph()
@@ -156,8 +156,8 @@ class WordReportGenerator:
             try:
                 run = p_img.add_run()
                 run.add_picture(image_path, width=Inches(3.5))
-            except Exception:
-                pass
+            except Exception as e:
+                print(f"Erreur image: {e}")
         self._doc.add_paragraph()
 
         # Auteur du livre
@@ -188,7 +188,7 @@ class WordReportGenerator:
 
         self._doc.add_page_break()
 
-    # ── Page graphique ───────────────────────────
+    # Page graphique 
     def _build_chart_page(self, analysis: dict, chart_path: str) -> None:
         """Page 2 : graphique de distribution + description."""
         self._add_heading("Distribution des longueurs de paragraphes", level=2)
@@ -203,29 +203,27 @@ class WordReportGenerator:
             try:
                 run = p_img.add_run()
                 run.add_picture(chart_path, width=Inches(6))
-            except Exception:
-                pass
+            except Exception as e:
+                print(f"Erreur image : {e}")
         self._doc.add_paragraph()
 
         self._doc.add_page_break()
 
-    # ── Page description ─────────────────────────
+    #  Page description 
     def _build_description_page(self, metadata: dict, analysis: dict) -> None:
         """Page 3 : analyse détaillée et statistiques."""
         self._add_heading("Description et Analyse", level=2)
         self._doc.add_paragraph()
 
-        # Synopsis de Peter Pan
-        self._add_heading("Résumé de l'intrigue", level=3)
-        synopsis = (
-            "Peter Pan, écrit par J. M. Barrie, est un roman fantastique publié en 1911. "
-            "Il raconte l'histoire de Wendy Darling et de ses frères, emmenés par le mystérieux "
-            "Peter Pan au Pays Imaginaire (Neverland), un monde où les enfants ne grandissent jamais. "
-            "Ils y affrontent le terrible Capitaine Crochet et ses pirates, découvrent les fées, "
-            "les sirènes et les enfants perdus. Le roman explore des thèmes universels tels que "
-            "l'enfance, la croissance, l'imaginaire et la nostalgie de l'innocence."
-        )
-        self._add_text(synopsis)
+        # Extrait du 1er chapitre de Peter Pan
+
+        self._add_heading("Extrait du Chapitre I", level=3)
+        paragraphs = analysis.get("paragraphs", [])
+        if paragraphs:
+            extrait = "\n\n".join(paragraphs[:3])
+        else:
+            extrait = "Texte non disponible."
+        self._add_text(extrait)
         self._doc.add_paragraph()
 
         # Statistiques
